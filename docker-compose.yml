@@ -4,9 +4,11 @@ services: # コンテナ（サービス）の定義エリア
     build:
       context: . # ビルドに必要なファイルのディレクトリ(.)
       dockerfile: Dockerfile.dev # 開発用の設計図(Dockerfile.dev)を使ってビルド
+      args:
+        UID: ${UID}
+        GID: ${GID}
     ports:
       - "3000:3000" # ホストの3000番ポートを、コンテナの3000番に繋ぐ
-    user: "${UID}:${GID}"
     volumes:
       - .:/app # ホストのコードをコンテナ内の/appに同期させる（ホットリロード用）
       - /app/node_modules # ホスト側のnode_modulesでコンテナ内を上書きしないための「避難場所」（匿名ボリューム）
