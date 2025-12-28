@@ -21,7 +21,7 @@ services: # コンテナ（サービス）の定義エリア
     depends_on:
       - db # dbコンテナが起動するのを待ってからapiを起動する
     # commandを書くとDockerfileのCMDが上書きされるらしい
-    command: /bin/sh -c "npx prisma migrate deploy && npm run start:dev" #migrationが成功したらアプリを起動
+    command: /bin/sh -c "npx prisma generate && npx prisma migrate deploy && npm run start:dev" #migrationが成功したらアプリを起動
 
   # --- データベースサーバー (PostgreSQL) ---
   db:
