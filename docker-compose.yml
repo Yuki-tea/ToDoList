@@ -2,7 +2,7 @@ services: # コンテナ（サービス）の定義エリア
   # --- アプリケーションサーバー (NestJS) ---
   api:
     build:
-      context: . # ビルドに必要なファイルのディレクトリ(.)
+      context: ./api # ビルドに必要なファイルのディレクトリ(.)
       dockerfile: Dockerfile.dev # 開発用の設計図(Dockerfile.dev)を使ってビルド
       args:
         UID: ${UID}
@@ -10,7 +10,7 @@ services: # コンテナ（サービス）の定義エリア
     ports:
       - "3000:3000" # ホストの3000番ポートを、コンテナの3000番に繋ぐ
     volumes:
-      - .:/app # ホストのコードをコンテナ内の/appに同期させる（ホットリロード用）
+      - ./api:/app # ホストのコードをコンテナ内の/appに同期させる（ホットリロード用）
       - /app/node_modules # ホスト側のnode_modulesでコンテナ内を上書きしないための「避難場所」（匿名ボリューム）
     environment: # コンテナ内で使える環境変数
       DB_HOST: db # 接続先はIPアドレスではなく、下のサービス名「db」を指定する
@@ -18,10 +18,30 @@ services: # コンテナ（サービス）の定義エリア
       DB_USERNAME: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: ${POSTGRES_DB}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
     depends_on:
       - db # dbコンテナが起動するのを待ってからapiを起動する
     # commandを書くとDockerfileのCMDが上書きされるらしい
     command: /bin/sh -c "npx prisma generate && npx prisma migrate deploy && npm run start:dev" #migrationが成功したらアプリを起動
+
+  # --- フロントエンド (Next.js) ---
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile.dev
+      args:
+        UID: ${UID}
+        GID: ${GID}
+    ports:
+      - "3001:3000" # ホストの3001番を、コンテナの3000番につなぐ
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    environment:
+      # ブラウザからAPIを呼ぶためのURL
+      - NEXT_PUBLIC_API_URL=http://localhost:3000
+    depends_on:
+      - api # APIが立ち上がってからWebを立ち上げる
 
   # --- データベースサーバー (PostgreSQL) ---
   db:
