@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { createTask } from "./actions";
 
 // 1. タスクの型定義（APIが返すデータの形）
 type Task = {
@@ -32,7 +33,23 @@ export default async function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center p-24 bg-white text-black">
       <h1 className="text-4xl font-bold mb-8">Todo List</h1>
-      
+      {/* create-task-form */}
+      <form action={createTask} className="flex gap-2 mb-8 w-full max-w-md">
+        <input
+          type="text"
+          name="title"
+          placeholder="新しいタスクを入力..."
+          className="border border-gray-300 p-2 rounded flex-grow text-black"
+          required
+        />
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+        >
+          追加
+        </button>
+      </form>
+
       {/* タスク一覧表示エリア */}
       <div className="w-full max-w-md">
         {tasks.length === 0 ? (
