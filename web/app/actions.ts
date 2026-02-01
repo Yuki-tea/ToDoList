@@ -27,3 +27,15 @@ export async function createTask(formData: FormData) {
   // トップページのキャッシュをクリアして、最新リストを再取得させる
   revalidatePath("/");
 }
+
+export async function deleteTask(formData: FormData) {
+  // idを取得
+  const id = formData.get("id");
+
+  // 削除用のAPIを叩く 
+  await fetch(`http://api:3000/task/${id}`, {
+    method: "DELETE",
+  });
+
+  revalidatePath("/");
+}
