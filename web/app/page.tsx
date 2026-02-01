@@ -1,31 +1,8 @@
 import Image from "next/image";
-import { createTask } from "./actions";
+import { getTasks } from "@/lib/api";
+import { createTask, deleteTask } from "./actions";
 
-// 1. タスクの型定義（APIが返すデータの形）
-type Task = {
-  id: number;
-  title: string;
-  isCompleted: boolean;
-};
-
-// 2. データを取得する関数 (Server Side)
-async function getTasks(): Promise<Task[]> {
-  // ★重要: Dockerコンテナ間の通信なので 'localhost' ではなく
-  // docker-compose.yml で付けたサービス名 'api' を使います。
-  const res = await fetch('http://api:3000/task', {
-    cache: 'no-store', // 常に最新データを取る設定
-  });
-
-  if (!res.ok) {
-    // APIがまだエラーを返している場合などのハンドリング
-    console.error('Failed to fetch tasks');
-    return [];
-  }
-
-  return res.json();
-}
-
-// 3. メインのコンポーネント
+// メインのコンポーネント
 export default async function Home() {
   // サーバー側でデータを取得
   const tasks = await getTasks();
@@ -62,6 +39,17 @@ export default async function Home() {
                 <span className="text-sm text-gray-400">
                   {task.isCompleted ? "完了" : "未完了"}
                 </span>
+                {/* 削除ボタン */}
+                <form action={deleteTask}>
+                  <input type="hidden" name="id" value={task.id} />
+                  <button
+                    type="submit"
+                    className="text-red-500 hover:text-red-700 p1"
+                    aria-label="削除"
+                  >
+                    🗑️
+                  </button>
+                </form>
               </li>
             ))}
           </ul>
