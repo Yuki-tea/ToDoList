@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { createTask } from "./actions";
+import { createTask, deleteTask } from "./actions";
 
 // 1. タスクの型定義（APIが返すデータの形）
 type Task = {
@@ -62,6 +62,17 @@ export default async function Home() {
                 <span className="text-sm text-gray-400">
                   {task.isCompleted ? "完了" : "未完了"}
                 </span>
+                {/* 削除ボタン */}
+                <form action={deleteTask}>
+                  <input type="hidden" name="id" value={task.id} />
+                  <button
+                    type="submit"
+                    className="text-red-500 hover:text-red-700 p1"
+                    aria-label="削除"
+                  >
+                    🗑️
+                  </button>
+                </form>
               </li>
             ))}
           </ul>
