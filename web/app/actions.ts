@@ -39,3 +39,21 @@ export async function deleteTask(formData: FormData) {
 
   revalidatePath("/");
 }
+
+export async function toggleTask(formData: FormData) {
+  // idを取得
+  const id = formData.get("id");
+  const isCompleted = formData.get("isCompleted") === "true";
+
+  await fetch(`http://api:3000/task/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      isCompleted: !isCompleted,
+    }),
+  });
+
+  revalidatePath("/");
+}
