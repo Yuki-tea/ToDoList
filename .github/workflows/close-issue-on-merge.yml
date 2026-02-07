@@ -1,0 +1,58 @@
+name: Close Issues on Merge to Develop
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - develop # developブランチに向けたPRが対象
+
+permissions:
+  issues: write # Issueを閉じる権限を与える
+  pull-requests: read
+
+jobs:
+  close-issues:
+    # PRが「マージされた時」のみ実行（クローズだけしてマージしなかった場合は実行しない）
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close linked issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body;
+            if (!body) {
+              console.log("PR body is empty.");
+              return;
+            }
+
+            // GitHub標準のキーワード（close, fix, resolveなど）を検出する正規表現
+            const regex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+#(\d+)/gi;
+            let match;
+            const issuesToClose = new Set();
+
+            // 本文から "close #12" のような記述をすべて抽出
+            while ((match = regex.exec(body)) !== null) {
+              issuesToClose.add(match[1]);
+            }
+
+            if (issuesToClose.size === 0) {
+              console.log("No linked issues found.");
+              return;
+            }
+
+            // 抽出したIssueを一つずつ閉じる
+            for (const issueNumber of issuesToClose) {
+              console.log(`Closing issue #${issueNumber}...`);
+              try {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: parseInt(issueNumber),
+                  state: 'closed'
+                });
+                console.log(`✅ Issue #${issueNumber} closed.`);
+              } catch (error) {
+                console.error(`❌ Failed to close issue #${issueNumber}: ${error.message}`);
+              }
+            }
