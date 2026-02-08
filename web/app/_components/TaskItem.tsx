@@ -1,0 +1,55 @@
+import { deleteTask, toggleTask } from "../actions";
+import { Task } from "@/lib/api";
+
+type Props = {
+  task: Task;
+};
+
+export function TaskItem({ task }: Props) {
+  return (
+    <li
+      key={task.id}
+      className="border p-4 rounded-lg shadow-sm flex justify-between items-center"
+    >
+      <div className="flex items-center gap-2">
+        {/* 完了切り替えtoggle */}
+        <form action={toggleTask}>
+          <input type="hidden" name="id" value={task.id} />
+          <input
+            type="hidden"
+            name="isCompleted"
+            value={task.isCompleted.toString()}
+          />
+          <button
+            type="submit"
+            className={`w-6 h-6 rounded border flex items-center justify-center ${task.isCompleted ? "bg-green-500" : "bg-white border-gray-300"}`}
+          >
+            {task.isCompleted && <span className="text-white">✅</span>}
+          </button>
+        </form>
+
+        <span className={task.isCompleted ? "line-through text-gray-400" : ""}>
+          {task.title}
+        </span>
+        <span
+          className={
+            task.isCompleted ? "text-sm text-gray-400" : "text-sm text-red-400"
+          }
+        >
+          {task.isCompleted ? "完了" : "未完了"}
+        </span>
+      </div>
+      {/* 削除ボタン */}
+      <form action={deleteTask}>
+        <input type="hidden" name="id" value={task.id} />
+        <button
+          type="submit"
+          className="text-red-500 hover:text-red-700 p1"
+          aria-label="削除"
+        >
+          🗑️
+        </button>
+      </form>
+    </li>
+  );
+}

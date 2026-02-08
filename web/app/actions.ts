@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -8,7 +8,7 @@ export async function createTask(formData: FormData) {
   const title = formData.get("title");
 
   // 空文字なら何もしない
-  if(!title || title.toString().trim() === "") {
+  if (!title || title.toString().trim() === "") {
     return;
   }
 
@@ -21,7 +21,7 @@ export async function createTask(formData: FormData) {
     body: JSON.stringify({
       title: title,
       isCompleted: false,
-    })
+    }),
   });
 
   // トップページのキャッシュをクリアして、最新リストを再取得させる
@@ -32,7 +32,7 @@ export async function deleteTask(formData: FormData) {
   // idを取得
   const id = formData.get("id");
 
-  // 削除用のAPIを叩く 
+  // 削除用のAPIを叩く
   await fetch(`http://api:3000/task/${id}`, {
     method: "DELETE",
   });
