@@ -7,10 +7,7 @@ type Props = {
 
 export function TaskItem({ task }: Props) {
   return (
-    <li
-      key={task.id}
-      className="border p-4 rounded-lg shadow-sm flex justify-between items-center"
-    >
+    <li className="border p-4 rounded-lg shadow-sm flex justify-between items-center">
       <div className="flex items-center gap-2">
         {/* 完了切り替えtoggle */}
         <form action={toggleTask}>
