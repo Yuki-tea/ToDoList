@@ -3,7 +3,11 @@
 import { useState, useRef } from "react";
 import { createTask } from "../actions";
 
-export function TaskCreateForm() {
+type Props = {
+  action: (formData: FormData) => Promise<void>;
+};
+
+export function TaskCreateForm({ action }: Props) {
   const [isPending, setIsPending] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -15,8 +19,9 @@ export function TaskCreateForm() {
     setIsPending(true);
 
     try {
-      // Server Actionを直接呼び出す
-      await createTask(formData);
+      // TaskManagerからprops経由で渡されたhandleCreateTaskを実行
+      // UI変更とPOSTリクエストを行う
+      await action(formData);
 
       // ✅ 送信成功後に入力欄をクリアする
       formRef.current?.reset();
