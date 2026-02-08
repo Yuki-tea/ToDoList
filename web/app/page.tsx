@@ -9,13 +9,13 @@ export default async function Home() {
   const tasks = await getTasks();
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-24 bg-white text-black">
+    <div className="flex min-h-screen flex-col items-center py-12 px-4 bg-white text-black">
       <h1 className="text-4xl font-bold mb-8">Todo List</h1>
       <TaskCreateForm />
       {/* タスク一覧表示エリア */}
       <div className="w-full max-w-md">
         <TaskList tasks={tasks} />
       </div>
-    </main>
+    </div>
   );
 }
