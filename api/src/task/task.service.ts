@@ -12,7 +12,12 @@ export class TaskService {
 
   // 全件取得
   findAll(): Promise<Task[]> {
-    return this.prisma.task.findMany();
+    return this.prisma.task.findMany({
+      orderBy: [
+        { position: "asc" }, // オリジナルの並び順
+        { id: "asc" } // 同じだったら古い順
+      ],
+    });
   }
 
   // IDで1件取得
