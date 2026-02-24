@@ -1,0 +1,48 @@
+# docker compose -f docker-compose.prod.yml up --buildで起動
+
+services:
+  # --- アプリケーションサーバー (NestJS) ---
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile # 汎用（本番用）Dockerfileを使用
+    restart: always
+    # ポートは必要に応じて。リバースプロキシ（Nginx等）を置くなら公開不要な場合もあります
+    ports:
+      - "3000:3000"
+    environment:
+      # 本番環境のDB接続先やパスワードを別途指定
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
+    depends_on:
+      - db
+
+  # --- フロントエンド (Next.js) ---
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile # 汎用（本番用）Dockerfileを使用
+    restart: always
+    ports:
+      - "80:3000" # 本番はHTTP標準の80番で受ける構成例
+    environment:
+      # ブラウザからアクセス可能なAPIのURL（ドメイン名など）
+      - NEXT_PUBLIC_API_URL=http://your-domain.com:3000
+    depends_on:
+      - api
+
+  # --- データベースサーバー (PostgreSQL) ---
+  db:
+    image: postgres:15-alpine
+    restart: always
+    # 本番では外部からの直接アクセスを防ぐため ports は記述しない
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    # dockerが管理する場所で永続化
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data # 本番専用ボリューム
+
+# ボリュームの定義
+volumes:
+  postgres_prod_data:
