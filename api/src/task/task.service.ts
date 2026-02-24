@@ -17,6 +17,10 @@ export class TaskService {
         { position: "asc" }, // オリジナルの並び順
         { id: "asc" } // 同じだったら古い順
       ],
+      // taskデータに結びついたtagデータも含める
+      include: {
+        tags: true,
+      },
     });
   }
 
@@ -24,6 +28,10 @@ export class TaskService {
   findOne(id: number): Promise<Task | null> {
     return this.prisma.task.findUnique({
       where: { id },
+      // taskデータに結びついたtagデータも含める
+      include: {
+        tags: true,
+      },
     });
   }
 
@@ -35,10 +43,22 @@ export class TaskService {
   }
 
   // 更新
-  update(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {
+  update(id: number, updateTaskDto: UpdateTaskDto & { tagIds?: number[] }): Promise<Task> {
+    const { tagIds, ...rest } = updateTaskDto;
+    const updateData: any = { ...rest };
+
+    if(tagIds !== undefined) {
+      updateData.tags = {
+        set: tagIds.map((tagId) => ({ id: tagId })),
+      };
+    }
+
     return this.prisma.task.update({
       where: { id },
-      data: updateTaskDto,
+      data: updateData,
+      include: {
+        tags: true,
+      },
     });
   }
 

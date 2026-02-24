@@ -4,4 +4,5 @@ export class CreateTaskDto {
   isCompleted?: boolean;
   // JSONで送られてくる時は文字列になるからstringも必要らしい
   dueDate?: Date | string;
+  tags?: string[];
 }
