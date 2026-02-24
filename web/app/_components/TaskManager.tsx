@@ -13,19 +13,28 @@ type Props = {
 export function TaskManager({ initialTasks }: Props) {
   const [optimisticTasks, addOptimisticTask] = useOptimistic(
     initialTasks,
-    (state, newTaskTitle: string) => [
+    (state, newTask: { title: string; dueDate: string | null }) => [
       ...state,
-      { id: Math.random(), title: newTaskTitle, isCompleted: false },
+      {
+        id: Math.random(),
+        title: newTask.title,
+        isCompleted: false,
+        dueDate: newTask.dueDate,
+      },
     ],
   );
 
   // TaskCreateFormに渡す
   async function handleCreateTask(prevState: State, formData: FormData) {
     const title = formData.get("title") as string;
+    const dueDate = formData.get("dueDate") as string;
 
     // 1. サーバーに送る前に、見た目を先に更新！
     if (title.trim()) {
-      addOptimisticTask(title);
+      addOptimisticTask({
+        title: title,
+        dueDate: dueDate ? new Date(dueDate).toISOString() : null,
+      });
     }
 
     // 2. サーバーで実行

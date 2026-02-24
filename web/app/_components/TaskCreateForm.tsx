@@ -56,7 +56,6 @@ export function TaskCreateForm({ action }: Props) {
             type="date"
             name="dueDate"
             className="border border-gray-300 p-2 rounded flex-grow text-black disabled:bg-gray-100"
-            required
             disabled={isPending}
           />
         </div>
