@@ -8,6 +8,22 @@ type Props = {
   task: Task;
 };
 
+// MM/DD形式にフォーマットする関数
+function formatDueDate(dateString?: string | null) {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  return `${date.getMonth() + 1}/${date.getDate()}`;
+}
+
+function isOverdue(dateString?: string | null) {
+  if (!dateString) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dueDate = new Date(dateString);
+  dueDate.setHours(0, 0, 0, 0);
+  return dueDate < today;
+}
+
 export function TaskItem({ task }: Props) {
   const [optimisticIsCompleted, switchOptimistic] = useOptimistic(
     task.isCompleted,
@@ -43,6 +59,9 @@ export function TaskItem({ task }: Props) {
     return null;
   }
 
+  const formattedDate = formatDueDate(task.dueDate);
+  const overdue = !optimisticIsCompleted && isOverdue(task.dueDate);
+
   return (
     <li className="border p-4 rounded-lg shadow-sm flex justify-between items-center">
       <div className="flex items-center gap-2">
@@ -62,21 +81,25 @@ export function TaskItem({ task }: Props) {
           </button>
         </form>
 
-        <span
-          className={optimisticIsCompleted ? "line-through text-gray-400" : ""}
-        >
-          {task.title}
-        </span>
-        <span
-          className={
-            optimisticIsCompleted
-              ? "text-sm text-gray-400"
-              : "text-sm text-red-400"
-          }
-        >
-          {optimisticIsCompleted ? "完了" : "未完了"}
-        </span>
+        <div className="flex flex-col">
+          <span
+            className={
+              optimisticIsCompleted ? "line-through text-gray-400" : ""
+            }
+          >
+            {task.title}
+          </span>
+
+          <span
+            className={`text-xs flex items-center gap-1 mt-1 
+              ${overdue ? "text-red-500 font-bold" : "text-gray-500"}`}
+          >
+            📅 期限: {formattedDate ? formattedDate : "なし"}
+            {overdue && " (期限切れ!)"}
+          </span>
+        </div>
       </div>
+
       {/* 削除ボタン */}
       <form action={handleDelete}>
         <input type="hidden" name="id" value={task.id} />

@@ -13,6 +13,7 @@ export async function createTask(
 ): Promise<State> {
   // formから入力値を取得
   const title = formData.get("title") as string;
+  const dueDate = formData.get("dueDate") as string;
 
   // 空文字なら何もしない
   if (!title.trim()) {
@@ -29,6 +30,7 @@ export async function createTask(
       body: JSON.stringify({
         title: title,
         isCompleted: false,
+        dueDate: dueDate ? new Date(dueDate).toISOString() : null,
       }),
     });
 
