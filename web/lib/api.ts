@@ -3,6 +3,7 @@ type Task = {
   id: number;
   title: string;
   isCompleted: boolean;
+  dueDate?: string | null;
 };
 
 // データを取得する関数 (Server Side)

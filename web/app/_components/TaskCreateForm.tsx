@@ -44,6 +44,23 @@ export function TaskCreateForm({ action }: Props) {
           required
           disabled={isPending}
         />
+        <div className="flex items-center gap-2 border border-gray-300 rounded px-3 bg-white disabled:bg-gray-100 focus-within:border-blue-500">
+          <label
+            htmlFor="dueDate"
+            className="text-sm text-gray-500 whitespace-nowrap cursor-pointer"
+          >
+            📅 期限:
+          </label>
+
+          <input
+            type="date"
+            name="dueDate"
+            className="border border-gray-300 p-2 rounded flex-grow text-black disabled:bg-gray-100"
+            required
+            disabled={isPending}
+          />
+        </div>
+
         <button
           type="submit"
           disabled={isPending}
