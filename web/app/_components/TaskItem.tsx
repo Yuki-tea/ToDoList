@@ -1,3 +1,6 @@
+"use client";
+
+import { useOptimistic } from "react";
 import { deleteTask, toggleTask } from "../actions";
 import { Task } from "@/lib/api";
 
@@ -6,11 +9,20 @@ type Props = {
 };
 
 export function TaskItem({ task }: Props) {
+  const [optimisticIsCompleted, switchOptimistic] = useOptimistic(
+    task.isCompleted,
+    (currentState) => !currentState,
+  );
+
+  async function handleToggle(formData: FormData) {
+    switchOptimistic(undefined);
+    await toggleTask(formData);
+  }
   return (
     <li className="border p-4 rounded-lg shadow-sm flex justify-between items-center">
       <div className="flex items-center gap-2">
         {/* 完了切り替えtoggle */}
-        <form action={toggleTask}>
+        <form action={handleToggle}>
           <input type="hidden" name="id" value={task.id} />
           <input
             type="hidden"
@@ -19,21 +31,25 @@ export function TaskItem({ task }: Props) {
           />
           <button
             type="submit"
-            className={`w-6 h-6 rounded border flex items-center justify-center ${task.isCompleted ? "bg-green-500" : "bg-white border-gray-300"}`}
+            className={`w-6 h-6 rounded border flex items-center justify-center ${optimisticIsCompleted ? "bg-green-500" : "bg-white border-gray-300"}`}
           >
-            {task.isCompleted && <span className="text-white">✅</span>}
+            {optimisticIsCompleted && <span className="text-white">✅</span>}
           </button>
         </form>
 
-        <span className={task.isCompleted ? "line-through text-gray-400" : ""}>
+        <span
+          className={optimisticIsCompleted ? "line-through text-gray-400" : ""}
+        >
           {task.title}
         </span>
         <span
           className={
-            task.isCompleted ? "text-sm text-gray-400" : "text-sm text-red-400"
+            optimisticIsCompleted
+              ? "text-sm text-gray-400"
+              : "text-sm text-red-400"
           }
         >
-          {task.isCompleted ? "完了" : "未完了"}
+          {optimisticIsCompleted ? "完了" : "未完了"}
         </span>
       </div>
       {/* 削除ボタン */}
