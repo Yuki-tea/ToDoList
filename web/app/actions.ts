@@ -46,12 +46,20 @@ export async function deleteTask(formData: FormData) {
   // idを取得
   const id = formData.get("id");
 
-  // 削除用のAPIを叩く
-  await fetch(`http://api:3000/task/${id}`, {
-    method: "DELETE",
-  });
-
-  revalidatePath("/");
+  try {
+    // 削除用のAPIを叩く
+    const res = await fetch(`http://api:3000/task/${id}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      throw new Error("Failed to delete task");
+    }
+    revalidatePath("/");
+    return { error: null };
+  } catch (error) {
+    console.error("deleteTask error:", error);
+    return { error: "削除に失敗しました" };
+  }
 }
 
 export async function toggleTask(formData: FormData) {
