@@ -7,7 +7,7 @@ import { TaskList } from "./TaskList";
 import { createTask } from "../actions";
 type Props = {
   initialTasks: Task[];
-}
+};
 
 export function TaskManager({ initialTasks }: Props) {
   const [optimisticTasks, addOptimisticTask] = useOptimistic(
