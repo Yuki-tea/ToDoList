@@ -16,7 +16,10 @@ export function TaskItem({ task }: Props) {
 
   async function handleToggle(formData: FormData) {
     switchOptimistic(undefined);
-    await toggleTask(formData);
+    const result = await toggleTask(formData);
+    if (result?.error) {
+      alert(result.error);
+    }
   }
   return (
     <li className="border p-4 rounded-lg shadow-sm flex justify-between items-center">

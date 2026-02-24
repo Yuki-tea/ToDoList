@@ -59,15 +59,23 @@ export async function toggleTask(formData: FormData) {
   const id = formData.get("id");
   const isCompleted = formData.get("isCompleted") === "true";
 
-  await fetch(`http://api:3000/task/${id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      isCompleted: !isCompleted,
-    }),
-  });
-
-  revalidatePath("/");
+  try {
+    const res = await fetch(`http://api:3000/task/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        isCompleted: !isCompleted,
+      }),
+    });
+    if (!res.ok) {
+      throw new Error("Failed to update task");
+    }
+    revalidatePath("/");
+    return { error: null };
+  } catch (error) {
+    console.error("toggleTask error:", error);
+    return { error: "更新に失敗しました" };
+  }
 }
