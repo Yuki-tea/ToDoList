@@ -1,11 +1,13 @@
 "use client";
 
-import { useOptimistic } from "react";
-import { deleteTask, toggleTask } from "../actions";
-import { Task } from "@/lib/api";
+// useActionStateはform用でuseTransitionはそれ以外用らしい
+import { useOptimistic, useTransition } from "react";
+import { deleteTask, toggleTask, toggleTaskTag } from "../actions";
+import { Task, Tag } from "@/lib/api";
 
 type Props = {
   task: Task;
+  allTags: Tag[];
 };
 
 // MM/DD形式にフォーマットする関数
@@ -24,7 +26,8 @@ function isOverdue(dateString?: string | null) {
   return dueDate < today;
 }
 
-export function TaskItem({ task }: Props) {
+export function TaskItem({ task, allTags }: Props) {
+  const [isPending, startTransition] = useTransition();
   const [optimisticIsCompleted, switchOptimistic] = useOptimistic(
     task.isCompleted,
     // Reactの仕様で第一引数に現在の状態が渡される
@@ -54,6 +57,12 @@ export function TaskItem({ task }: Props) {
     }
   }
 
+  const handleToggleTag = (tagId: number, isAttached: boolean) => {
+    startTransition(async () => {
+      await toggleTaskTag(task.id, tagId, isAttached);
+    });
+  };
+
   if (isDeletedOptimistic) {
     // この呼び出し時には描画無し
     return null;
@@ -61,6 +70,8 @@ export function TaskItem({ task }: Props) {
 
   const formattedDate = formatDueDate(task.dueDate);
   const overdue = !optimisticIsCompleted && isOverdue(task.dueDate);
+
+  const attachedTagIds = task.tags?.map((t) => t.id) || [];
 
   return (
     <li className="border p-4 rounded-lg shadow-sm flex justify-between items-center">
@@ -82,6 +93,7 @@ export function TaskItem({ task }: Props) {
         </form>
 
         <div className="flex flex-col">
+          {/* タスク名表示 */}
           <span
             className={
               optimisticIsCompleted ? "line-through text-gray-400" : ""
@@ -90,6 +102,61 @@ export function TaskItem({ task }: Props) {
             {task.title}
           </span>
 
+          {/*  タグ表示エリア */}
+          <div className="flex flex-wrap items-center gap-1">
+            {/* 紐づいているタグを表示 */}
+            {task.tags?.map((tag) => (
+              <span
+                key={tag.id}
+                className="text-[10px] bg-green-100 text-green-800 px-2 py-0.5 rounded-full border border-green-200"
+              >
+                {tag.name}
+              </span>
+            ))}
+
+            {/* タグ追加ドロップダウン（detailsタグを使ったCSSだけの簡易メニュー） */}
+            {allTags.length > 0 && (
+              <details className="relative group">
+                <summary className="text-[10px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full cursor-pointer list-none hover:bg-gray-200 transition-colors">
+                  ＋ タグ
+                </summary>
+                {/* ドロップダウンの中身 */}
+                <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded shadow-lg p-2 z-10 w-40 max-h-48 overflow-y-auto">
+                  <p className="text-xs text-gray-500 mb-2 font-bold border-b pb-1">
+                    タグを選択
+                  </p>
+                  <div className="flex flex-col gap-1">
+                    {allTags.map((tag) => {
+                      const isAttached = attachedTagIds.includes(tag.id);
+                      return (
+                        <label
+                          key={tag.id}
+                          className="flex items-center gap-2 text-xs p-1 hover:bg-gray-50 cursor-pointer rounded"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isAttached}
+                            onChange={() => handleToggleTag(tag.id, isAttached)}
+                            disabled={isPending} // 通信中は連打できないようにする
+                            className="accent-green-600"
+                          />
+                          <span
+                            className={
+                              isAttached ? "font-bold text-green-700" : ""
+                            }
+                          >
+                            {tag.name}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              </details>
+            )}
+          </div>
+
+          {/* 期限の表示 */}
           <span
             className={`text-xs flex items-center gap-1 mt-1 
               ${overdue ? "text-red-500 font-bold" : "text-gray-500"}`}

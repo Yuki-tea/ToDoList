@@ -46,7 +46,7 @@ export function TaskManager({ initialTasks, initialTags }: Props) {
   return (
     <div className="w-full max-w-md">
       <TaskCreateForm action={handleCreateTask} />
-      <TaskList tasks={optimisticTasks} />
+      <TaskList tasks={optimisticTasks} tags={initialTags}/>
       <TagCreateForm tags={initialTags} />
     </div>
   );
