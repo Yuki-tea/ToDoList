@@ -1,15 +1,30 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
+import { PrismaService } from "../prisma.service";
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
+import { Tag } from "@prisma/client";
 
 @Injectable()
 export class TagService {
-  create(createTagDto: CreateTagDto) {
-    return 'This action adds a new tag';
+  constructor(private prisma: PrismaService) {}
+
+  async create(createTagDto: CreateTagDto) {
+    try {
+      return await this.prisma.tag.create({
+        data: createTagDto,
+      });
+    } catch (error: any) {
+      if (error.code === "P2002") {
+        throw new ConflictException("そのタグは既に存在します");
+      }
+      throw error;
+    }
   }
 
   findAll() {
-    return `This action returns all tag`;
+    return this.prisma.tag.findMany({
+      orderBy: { id: "asc" },
+    });
   }
 
   findOne(id: number) {
