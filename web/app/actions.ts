@@ -89,3 +89,48 @@ export async function toggleTask(formData: FormData) {
     return { error: "更新に失敗しました" };
   }
 }
+
+export async function createTag(
+  prevState: any,
+  formData: FormData,
+) {
+  const name = formData.get("name") as string;
+
+  if (!name.trim()) {
+    return { error: "タグを入力してください"}
+  }
+
+  try {
+    const res = await fetch("http://api:3000/tag", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name }),
+    });
+
+    if (!res.ok) {
+      return { error: "タグの作成に失敗しました" }
+    }
+
+    revalidatePath("/");
+    return { error: null };
+  } catch(error) {
+    console.error(error);
+    return { error: "サーバーでエラーが発生しました" };
+  }
+}
+// FormDataを使わない直接呼び出し用のアクションなので、少し引数が違う
+export async function toggleTaskTag(taskId: number, tagId: number, isCurrentlyAttached: boolean) {
+  try {
+    // 既に付いているならDELETE、付いていないならPOST
+    const method = isCurrentlyAttached ? "DELETE" : "POST";
+    await fetch(`http://api:3000/task/${taskId}/tags/${tagId}`, {
+      method: method,
+    });
+
+    revalidatePath("/");
+  } catch (error) {
+    console.error(error);
+  }
+}

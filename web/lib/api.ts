@@ -1,10 +1,17 @@
 // タスクの型定義(APIが返すデータの形)
-type Task = {
+export type Task = {
   id: number;
   title: string;
   isCompleted: boolean;
   dueDate?: string | null;
+  position?: number;
+  tags?: Tag[];
 };
+
+export type Tag = {
+  id: number;
+  name: string;
+}
 
 // データを取得する関数 (Server Side)
 export async function getTasks(): Promise<Task[]> {

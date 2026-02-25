@@ -4,6 +4,7 @@ import { useOptimistic } from "react";
 import { Task } from "@/lib/api";
 import { TaskCreateForm } from "./TaskCreateForm";
 import { TaskList } from "./TaskList";
+import { TagCreateForm } from "./TagCreateForm";
 import { createTask, State } from "../actions";
 
 type Props = {
@@ -45,6 +46,7 @@ export function TaskManager({ initialTasks }: Props) {
     <div className="w-full max-w-md">
       <TaskCreateForm action={handleCreateTask} />
       <TaskList tasks={optimisticTasks} />
+      <TagCreateForm />
     </div>
   );
 }
