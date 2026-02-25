@@ -1,13 +1,13 @@
 "use client";
 
 // useActionStateはform用でuseTransitionはそれ以外用らしい
-import { useOptimistic, useTransition, useState } from "react";
+import { useOptimistic, useTransition, useState, useContext } from "react";
 import { deleteTask, toggleTask, toggleTaskTag } from "../actions";
 import { Task, Tag } from "@/lib/api";
+import { TagContext } from "./TagContext";
 
 type Props = {
   task: Task;
-  allTags: Tag[];
 };
 
 // MM/DD形式にフォーマットする関数
@@ -26,7 +26,7 @@ function isOverdue(dateString?: string | null) {
   return dueDate < today;
 }
 
-export function TaskItem({ task, allTags }: Props) {
+export function TaskItem({ task }: Props) {
   const [isPending, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
   const [optimisticIsCompleted, switchOptimistic] = useOptimistic(
@@ -34,6 +34,8 @@ export function TaskItem({ task, allTags }: Props) {
     // Reactの仕様で第一引数に現在の状態が渡される
     (currentState) => !currentState,
   );
+
+  const allTags = useContext(TagContext);
 
   async function handleToggle(formData: FormData) {
     // 自動で現在の状態が渡されるので要らないが、引数無しだと起こられるからとりあえず埋めてる

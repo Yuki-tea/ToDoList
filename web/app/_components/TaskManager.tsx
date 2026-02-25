@@ -5,6 +5,7 @@ import { Task, Tag } from "@/lib/api";
 import { TaskCreateForm } from "./TaskCreateForm";
 import { TaskList } from "./TaskList";
 import { TagCreateForm } from "./TagCreateForm";
+import { TagContext } from "./TagContext";
 import { createTask, State } from "../actions";
 
 type Props = {
@@ -46,7 +47,10 @@ export function TaskManager({ initialTasks, initialTags }: Props) {
   return (
     <div className="w-full max-w-md">
       <TaskCreateForm action={handleCreateTask} />
-      <TaskList tasks={optimisticTasks} tags={initialTags}/>
+      {/* バケツリレー無しでタグの情報を子コンポーネントに渡せる */}
+      <TagContext.Provider value={initialTags}>
+        <TaskList tasks={optimisticTasks} />
+      </TagContext.Provider>
       <TagCreateForm tags={initialTags} />
     </div>
   );
