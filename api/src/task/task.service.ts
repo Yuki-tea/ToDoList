@@ -68,4 +68,42 @@ export class TaskService {
       where: { id },
     });
   }
+
+  addTag(taskId: number, tagId: number): Promise<Task> {
+    return this.prisma.task.update({
+      where: { id: taskId },
+      data: {
+        tags: {
+          connect: { id: tagId },
+        },
+      },
+      include: { tags: true },
+    });
+  }
+
+  updateTags(taskId: number, tagIds: number[]): Promise<Task> {
+    return this.prisma.task.update({
+      where: { id: taskId },
+      data: {
+        tags: {
+          set: tagIds.map((tagId) => ({ id: tagId })),
+        },
+      },
+      include: {
+        tags: true
+      },
+    });
+  }
+
+  removeTag(taskId: number, tagId: number): Promise<Task> {
+    return this.prisma.task.update({
+      where: { id: taskId },
+      data: {
+        tags: {
+          disconnect: { id: tagId },
+        },
+      },
+      include: { tags: true },
+    });
+  }
 }
