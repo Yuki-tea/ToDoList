@@ -29,3 +29,17 @@ export async function getTasks(): Promise<Task[]> {
 
   return res.json();
 }
+
+// タグ一覧を取得する関数
+export async function getTags(): Promise<Tag[]> {
+  const res = await fetch("http://api:3000/tag", {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    console.error("Failed to fetch tags");
+    return [];
+  }
+
+  return res.json();
+}

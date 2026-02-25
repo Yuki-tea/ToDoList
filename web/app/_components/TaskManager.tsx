@@ -1,7 +1,7 @@
 "use client";
 
 import { useOptimistic } from "react";
-import { Task } from "@/lib/api";
+import { Task, Tag } from "@/lib/api";
 import { TaskCreateForm } from "./TaskCreateForm";
 import { TaskList } from "./TaskList";
 import { TagCreateForm } from "./TagCreateForm";
@@ -9,9 +9,10 @@ import { createTask, State } from "../actions";
 
 type Props = {
   initialTasks: Task[];
+  initialTags: Tag[];
 };
 
-export function TaskManager({ initialTasks }: Props) {
+export function TaskManager({ initialTasks, initialTags }: Props) {
   const [optimisticTasks, addOptimisticTask] = useOptimistic(
     initialTasks,
     (state, newTask: { title: string; dueDate: string | null }) => [
@@ -46,7 +47,7 @@ export function TaskManager({ initialTasks }: Props) {
     <div className="w-full max-w-md">
       <TaskCreateForm action={handleCreateTask} />
       <TaskList tasks={optimisticTasks} />
-      <TagCreateForm />
+      <TagCreateForm tags={initialTags} />
     </div>
   );
 }
