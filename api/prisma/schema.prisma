@@ -22,4 +22,15 @@ model Task {
   position Float @default(0)
   createdAt   DateTime @default(now()) // 作成日時
   updatedAt   DateTime @updatedAt // 更新日時
+
+  // 多対多のリレーションを実現(prismaが内部的に中間テーブルを作成してくれるらしい)
+  tags        Tag[]
+}
+
+model Tag {
+  id      Int @id @default(autoincrement())
+  name    String @unique // 重複禁止
+
+  // 多対多のリレーションを実現(prismaが内部的に中間テーブルを作成してくれるらしい)
+  tasks Task[]
 }

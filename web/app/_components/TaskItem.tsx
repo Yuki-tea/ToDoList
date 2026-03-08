@@ -1,8 +1,10 @@
 "use client";
 
+// useActionStateはform用でuseTransitionはそれ以外用らしい
 import { useOptimistic } from "react";
 import { deleteTask, toggleTask } from "../actions";
 import { Task } from "@/lib/api";
+import { TagPulldown } from "./TagPulldown";
 
 type Props = {
   task: Task;
@@ -81,7 +83,8 @@ export function TaskItem({ task }: Props) {
           </button>
         </form>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-1">
+          {/* タスク名表示 */}
           <span
             className={
               optimisticIsCompleted ? "line-through text-gray-400" : ""
@@ -90,6 +93,21 @@ export function TaskItem({ task }: Props) {
             {task.title}
           </span>
 
+          {/*  タグ表示エリア */}
+          <div className="flex flex-wrap items-center gap-1 relative">
+            <TagPulldown taskId={task.id} attachedTags={task.tags} />
+            {/* 紐づいているタグを表示 */}
+            {task.tags?.map((tag) => (
+              <span
+                key={tag.id}
+                className="text-[10px] bg-green-100 text-green-800 px-2 py-0.5 rounded-full border border-green-200"
+              >
+                {tag.name}
+              </span>
+            ))}
+          </div>
+
+          {/* 期限の表示 */}
           <span
             className={`text-xs flex items-center gap-1 mt-1 
               ${overdue ? "text-red-500 font-bold" : "text-gray-500"}`}

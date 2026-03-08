@@ -1,4 +1,4 @@
-import { Task } from "@/lib/api";
+import { Tasks } from "@/lib/api";
 import { TaskItem } from "./TaskItem";
 
 type Props = {
