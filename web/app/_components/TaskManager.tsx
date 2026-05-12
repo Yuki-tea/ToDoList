@@ -18,6 +18,8 @@ type Props = {
 export function TaskManager({ initialTasks, initialTags }: Props) {
   const [localTasks, setLocalTasks] = useState<Task[]>(initialTasks);
 
+  // useEffectで頑張るとUIカクつく
+  // ここでif無しでsetLocalTasks(initialTasks)を実行すると無限ループ入る
   const [prevInitialTasks, setPrevInitialTasks] =
     useState<Task[]>(initialTasks);
   if (initialTasks !== prevInitialTasks) {
