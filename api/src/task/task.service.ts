@@ -36,9 +36,20 @@ export class TaskService {
   }
 
   // 作成
-  create(createTaskDto: CreateTaskDto): Promise<Task> {
+  async create(createTaskDto: CreateTaskDto): Promise<Task> {
+    const maxPositionTask = await this.prisma.task.findFirst({
+      orderBy: {
+        position: "desc",
+      },
+    })
+
+    const nextPosition = maxPositionTask ? maxPositionTask.position + 1 : 0;
+
     return this.prisma.task.create({
-      data: createTaskDto,
+      data: {
+        ...createTaskDto,
+        position:nextPosition,
+      },
     });
   }
 

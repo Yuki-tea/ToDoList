@@ -155,7 +155,6 @@ export async function reorderTasks(taskIds: number[]) {
 
     revalidatePath("/");
     return { error: null };
-
   } catch (error) {
     console.error(error);
     return { error: "サーバーでエラーが発生しました" };

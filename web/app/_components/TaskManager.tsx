@@ -18,6 +18,13 @@ type Props = {
 export function TaskManager({ initialTasks, initialTags }: Props) {
   const [localTasks, setLocalTasks] = useState<Task[]>(initialTasks);
 
+  const [prevInitialTasks, setPrevInitialTasks] =
+    useState<Task[]>(initialTasks);
+  if (initialTasks !== prevInitialTasks) {
+    setLocalTasks(initialTasks);
+    setPrevInitialTasks(initialTasks);
+  }
+
   const [optimisticTasks, addOptimisticTask] = useOptimistic(
     localTasks,
     (state, newTask: { title: string; dueDate: string | null }) => [
@@ -27,6 +34,7 @@ export function TaskManager({ initialTasks, initialTags }: Props) {
         title: newTask.title,
         isCompleted: false,
         dueDate: newTask.dueDate,
+        tags: [],
       },
     ],
   );
@@ -55,7 +63,7 @@ export function TaskManager({ initialTasks, initialTags }: Props) {
       // useStateが自動でprevTasksに現状のlocalTasksを渡してくれる
       const oldIndex = localTasks.findIndex((item) => item.id === active.id);
       const newIndex = localTasks.findIndex((item) => item.id === over.id);
-      const newTasks =  arrayMove(localTasks, oldIndex, newIndex);
+      const newTasks = arrayMove(localTasks, oldIndex, newIndex);
 
       setLocalTasks(newTasks);
       const taskIds = newTasks.map((task) => task.id);
