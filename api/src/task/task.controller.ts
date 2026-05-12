@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
@@ -22,6 +31,12 @@ export class TaskController {
     return this.taskService.findOne(+id);
   }
 
+  @Patch('reorder')
+  async reorderTasks(@Body('taskIds') taskIds: number[]) {
+    await this.taskService.reorderTasks(taskIds);
+    return { success: true };
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
     return this.taskService.update(+id, updateTaskDto);
@@ -39,10 +54,7 @@ export class TaskController {
   }
 
   @Put(':id/tags')
-  updateTags(
-    @Param('id') id: string,
-    @Body('tagIds') tagIds: number[],
-  ) {
+  updateTags(@Param('id') id: string, @Body('tagIds') tagIds: number[]) {
     return this.taskService.updateTags(+id, tagIds);
   }
 

@@ -14,8 +14,8 @@ export class TaskService {
   findAll(): Promise<Task[]> {
     return this.prisma.task.findMany({
       orderBy: [
-        { position: "asc" }, // オリジナルの並び順
-        { id: "asc" } // 同じだったら古い順
+        { position: 'asc' }, // オリジナルの並び順
+        { id: 'asc' }, // 同じだったら古い順
       ],
       // taskデータに結びついたtagデータも含める
       include: {
@@ -43,11 +43,14 @@ export class TaskService {
   }
 
   // 更新
-  update(id: number, updateTaskDto: UpdateTaskDto & { tagIds?: number[] }): Promise<Task> {
+  update(
+    id: number,
+    updateTaskDto: UpdateTaskDto & { tagIds?: number[] },
+  ): Promise<Task> {
     const { tagIds, ...rest } = updateTaskDto;
     const updateData: any = { ...rest };
 
-    if(tagIds !== undefined) {
+    if (tagIds !== undefined) {
       updateData.tags = {
         set: tagIds.map((tagId) => ({ id: tagId })),
       };
@@ -90,7 +93,7 @@ export class TaskService {
         },
       },
       include: {
-        tags: true
+        tags: true,
       },
     });
   }
@@ -105,5 +108,15 @@ export class TaskService {
       },
       include: { tags: true },
     });
+  }
+
+  async reorderTasks(taskIds: number[]): Promise<void> {
+    const queries = taskIds.map((id, index) =>
+      this.prisma.task.update({
+        where: { id },
+        data: { position: index },
+      }),
+    );
+    await this.prisma.$transaction(queries);
   }
 }
