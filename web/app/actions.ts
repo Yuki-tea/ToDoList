@@ -22,7 +22,7 @@ export async function createTask(
 
   try {
     // Dockerの内部通信だからapi:...
-    await fetch("http://api:3000/task", {
+    await fetch("http://api:3000/tasks", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -50,7 +50,7 @@ export async function deleteTask(formData: FormData) {
 
   try {
     // 削除用のAPIを叩く
-    const res = await fetch(`http://api:3000/task/${id}`, {
+    const res = await fetch(`http://api:3000/tasks/${id}`, {
       method: "DELETE",
     });
     if (!res.ok) {
@@ -70,7 +70,7 @@ export async function toggleTask(formData: FormData) {
   const isCompleted = formData.get("isCompleted") === "true";
 
   try {
-    const res = await fetch(`http://api:3000/task/${id}`, {
+    const res = await fetch(`http://api:3000/tasks/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -90,18 +90,15 @@ export async function toggleTask(formData: FormData) {
   }
 }
 
-export async function createTag(
-  prevState: any,
-  formData: FormData,
-) {
+export async function createTag(prevState: any, formData: FormData) {
   const name = formData.get("name") as string;
 
   if (!name.trim()) {
-    return { error: "タグを入力してください"}
+    return { error: "タグを入力してください" };
   }
 
   try {
-    const res = await fetch("http://api:3000/tag", {
+    const res = await fetch("http://api:3000/tags", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -110,27 +107,56 @@ export async function createTag(
     });
 
     if (!res.ok) {
-      return { error: "タグの作成に失敗しました" }
+      return { error: "タグの作成に失敗しました" };
     }
 
     revalidatePath("/");
     return { error: null };
-  } catch(error) {
+  } catch (error) {
     console.error(error);
     return { error: "サーバーでエラーが発生しました" };
   }
 }
 // FormDataを使わない直接呼び出し用のアクションなので、少し引数が違う
-export async function toggleTaskTag(taskId: number, tagId: number, isCurrentlyAttached: boolean) {
+export async function toggleTaskTag(
+  taskId: number,
+  tagId: number,
+  isCurrentlyAttached: boolean,
+) {
   try {
     // 既に付いているならDELETE、付いていないならPOST
     const method = isCurrentlyAttached ? "DELETE" : "POST";
-    await fetch(`http://api:3000/task/${taskId}/tags/${tagId}`, {
+    await fetch(`http://api:3000/tasks/${taskId}/tags/${tagId}`, {
       method: method,
     });
 
     revalidatePath("/");
   } catch (error) {
     console.error(error);
+    return { error: "サーバーでエラーが発生しました" };
+  }
+}
+
+export async function reorderTasks(taskIds: number[]) {
+  try {
+    const res = await fetch("http://api:3000/tasks/reorder", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        taskIds: taskIds,
+      }),
+    });
+
+    if (!res.ok) {
+      return { error: "並び替えに失敗しました" };
+    }
+
+    revalidatePath("/");
+    return { error: null };
+  } catch (error) {
+    console.error(error);
+    return { error: "サーバーでエラーが発生しました" };
   }
 }

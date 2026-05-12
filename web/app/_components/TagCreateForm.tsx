@@ -9,7 +9,9 @@ type Props = {
 };
 
 export function TagCreateForm({ tags }: Props) {
-  const [state, formAction, isPending] = useActionState(createTag, { error: null });
+  const [state, formAction, isPending] = useActionState(createTag, {
+    error: null,
+  });
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = (formData: FormData) => {
@@ -35,11 +37,7 @@ export function TagCreateForm({ tags }: Props) {
         )}
       </div>
 
-      <form
-        ref={formRef}
-        action={handleSubmit}
-        className="flex gap-2 w-full"
-      >
+      <form ref={formRef} action={handleSubmit} className="flex gap-2 w-full">
         <input
           type="text"
           name="name"

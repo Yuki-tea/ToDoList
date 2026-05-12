@@ -40,9 +40,8 @@ export function TaskCreateForm({ action }: Props) {
           type="text"
           name="title"
           placeholder="新しいタスクを入力..."
-          className="border border-gray-300 p-2 rounded flex-grow text-black disabled:bg-gray-100"
+          className="border border-gray-300 p-2 rounded flex-grow text-black"
           required
-          disabled={isPending}
         />
         <div className="flex items-center gap-2 border border-gray-300 rounded px-3 bg-white disabled:bg-gray-100 focus-within:border-blue-500">
           <label
@@ -55,21 +54,16 @@ export function TaskCreateForm({ action }: Props) {
           <input
             type="date"
             name="dueDate"
-            className="border border-gray-300 p-2 rounded flex-grow text-black disabled:bg-gray-100"
-            disabled={isPending}
+            className="border-none outline-none bg-transparent p-2 rounded flex-grow text-black"
           />
         </div>
 
         <button
           type="submit"
           disabled={isPending}
-          className={`text-white px-4 py-2 rounded transition-colors ${
-            isPending
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
+          className="text-white px-3 py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 flex-shrink-0 whitespace-nowrap"
         >
-          {isPending ? "追加中..." : "追加"}
+          追加
         </button>
       </form>
       {state.error && (
