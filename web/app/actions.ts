@@ -133,5 +133,31 @@ export async function toggleTaskTag(
     revalidatePath("/");
   } catch (error) {
     console.error(error);
+    return { error: "サーバーでエラーが発生しました" };
+  }
+}
+
+export async function reorderTasks(taskIds: number[]) {
+  try {
+    const res = await fetch("http://api:3000/tasks/reorder", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        taskIds: taskIds,
+      }),
+    });
+
+    if (!res.ok) {
+      return { error: "並び替えに失敗しました" };
+    }
+
+    revalidatePath("/");
+    return { error: null };
+
+  } catch (error) {
+    console.error(error);
+    return { error: "サーバーでエラーが発生しました" };
   }
 }

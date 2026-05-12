@@ -6,7 +6,7 @@ import { TaskCreateForm } from "./TaskCreateForm";
 import { TaskList } from "./TaskList";
 import { TagCreateForm } from "./TagCreateForm";
 import { TagContext } from "./TagContext";
-import { createTask, State } from "../actions";
+import { createTask, State, reorderTasks } from "../actions";
 import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 
@@ -48,17 +48,18 @@ export function TaskManager({ initialTasks, initialTags }: Props) {
     return await createTask(prevState, formData);
   }
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
       // useStateが自動でprevTasksに現状のlocalTasksを渡してくれる
-      setLocalTasks((prevTasks) => {
-        const oldIndex = prevTasks.findIndex((item) => item.id === active.id);
-        const newIndex = prevTasks.findIndex((item) => item.id === over.id);
-        return arrayMove(prevTasks, oldIndex, newIndex);
-      });
-      // ここにサーバーへ新しい順番を保存するAPI呼び出しを書く
+      const oldIndex = localTasks.findIndex((item) => item.id === active.id);
+      const newIndex = localTasks.findIndex((item) => item.id === over.id);
+      const newTasks =  arrayMove(localTasks, oldIndex, newIndex);
+
+      setLocalTasks(newTasks);
+      const taskIds = newTasks.map((task) => task.id);
+      await reorderTasks(taskIds);
     }
   };
 
