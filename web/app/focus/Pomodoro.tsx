@@ -9,10 +9,8 @@ type Props = {
   setMode: (mode: Mode) => void;
 };
 
-//const FOCUS = 25 * 60;
-//const BREAK = 5 * 60;
-const FOCUS = 5;
-const BREAK = 10;
+const FOCUS = 25 * 60;
+const BREAK = 5 * 60;
 const LONG_BREAK = 15 * 60;
 const ROUTINE = 4;
 
