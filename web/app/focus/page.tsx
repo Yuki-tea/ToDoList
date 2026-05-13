@@ -7,7 +7,6 @@ import Pomodoro from "./Pomodoro";
 export default function FocusPage() {
   const [mode, setMode] = useState<Mode>("Focus");
   return (
-    //<div className="flex flex-col items-center justify-center bg-white min-h-[calc(100vh-64px)] p-6 text-center">
     <div
       className={`flex flex-col items-center justify-center min-h-[calc(100vh-64px)] p-6 text-center transition-colors
       duration-1000 ${mode === "Focus" ? "bg-indigo-600" : "bg-green-400"}`}
