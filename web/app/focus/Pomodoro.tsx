@@ -9,8 +9,10 @@ type Props = {
   setMode: (mode: Mode) => void;
 };
 
-const FOCUS = 25 * 60;
-const BREAK = 5 * 60;
+//const FOCUS = 25 * 60;
+//const BREAK = 5 * 60;
+const FOCUS = 5;
+const BREAK = 10;
 const LONG_BREAK = 15 * 60;
 const ROUTINE = 4;
 
@@ -83,7 +85,7 @@ export default function Pomodoro({ mode, setMode }: Props) {
           {mode === "Focus" ? "Stay Focused" : "Take a Break"}
         </h2>
 
-        <Timer time={timeCount} />
+        <Timer time={timeCount} mode={mode} />
 
         <div className="flex items-center gap-4 mt-6">
           <button
