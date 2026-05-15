@@ -15,15 +15,17 @@ RUN groupmod -g "${GID}" node && \
 
 # 4. 作業ディレクトリの所有権を変更したユーザー(node)に設定
 RUN chown -R node:node /app
-
 # 5. ユーザーを切り替え
 USER node
 
-# 6. 依存関係のインストール（nodeユーザーとして実行される）
+# 6. 依存関係とPrismaスキーマを先にコピー
 COPY --chown=node:node package*.json ./
-RUN npm ci
+COPY --chown=node:node prisma ./prisma/
 
-# 7. ソースコードのコピー
+# 7. 依存関係のインストールとPrisma Clientの生成（ビルド時に済ませる）
+RUN npm ci && npx prisma generate
+
+# 8. ソースコードのコピー
 COPY --chown=node:node . .
 
 CMD ["npm", "run", "start:dev"]
