@@ -1,5 +1,6 @@
 FROM node:24-alpine
 
+
 WORKDIR /app
 
 ARG UID=1000
@@ -14,9 +15,11 @@ RUN chown -R node:node /app
 
 USER node
 
+# 依存関係を先にコピー（キャッシュ効率化）
 COPY --chown=node:node package*.json ./
 RUN npm ci
 
+# 全ソースコードをコピー
 COPY --chown=node:node . .
 
 # Next.js 開発サーバーのポート(書かなくても動く)
