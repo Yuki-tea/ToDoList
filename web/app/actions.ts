@@ -7,6 +7,8 @@ export type State = {
   error: string | null;
 };
 
+const baseURL = process.env.API_INTERNAL_URL;
+
 export async function createTask(
   prevState: State,
   formData: FormData,
@@ -22,7 +24,7 @@ export async function createTask(
 
   try {
     // Dockerの内部通信だからapi:...
-    await fetch("http://api:3000/tasks", {
+    await fetch(`${baseURL}/tasks`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -50,7 +52,7 @@ export async function deleteTask(formData: FormData) {
 
   try {
     // 削除用のAPIを叩く
-    const res = await fetch(`http://api:3000/tasks/${id}`, {
+    const res = await fetch(`${baseURL}/tasks/${id}`, {
       method: "DELETE",
     });
     if (!res.ok) {
@@ -70,7 +72,7 @@ export async function toggleTask(formData: FormData) {
   const isCompleted = formData.get("isCompleted") === "true";
 
   try {
-    const res = await fetch(`http://api:3000/tasks/${id}`, {
+    const res = await fetch(`${baseURL}/tasks/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -98,7 +100,7 @@ export async function createTag(prevState: any, formData: FormData) {
   }
 
   try {
-    const res = await fetch("http://api:3000/tags", {
+    const res = await fetch(`${baseURL}/tags`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -126,7 +128,7 @@ export async function toggleTaskTag(
   try {
     // 既に付いているならDELETE、付いていないならPOST
     const method = isCurrentlyAttached ? "DELETE" : "POST";
-    await fetch(`http://api:3000/tasks/${taskId}/tags/${tagId}`, {
+    await fetch(`${baseURL}/tasks/${taskId}/tags/${tagId}`, {
       method: method,
     });
 
@@ -139,7 +141,7 @@ export async function toggleTaskTag(
 
 export async function reorderTasks(taskIds: number[]) {
   try {
-    const res = await fetch("http://api:3000/tasks/reorder", {
+    const res = await fetch(`${baseURL}/tasks/reorder`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
