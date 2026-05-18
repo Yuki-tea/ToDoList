@@ -1,3 +1,4 @@
 .env
 GEMINI.md
 node_modules/
+secrets/

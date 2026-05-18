@@ -13,11 +13,13 @@ export type Tag = {
   name: string;
 }
 
+const baseURL = process.env.API_INTERNAL_URL;
+
 // データを取得する関数 (Server Side)
 export async function getTasks(): Promise<Task[]> {
   // 重要: Dockerコンテナ間の通信なので 'localhost' ではなく
   // docker-compose.yml で付けたサービス名 'api' を使います。
-  const res = await fetch('http://api:3000/tasks', {
+  const res = await fetch(`${baseURL}/tasks`, {
     cache: 'no-store', // 常に最新データを取る設定
   });
 
@@ -32,7 +34,7 @@ export async function getTasks(): Promise<Task[]> {
 
 // タグ一覧を取得する関数
 export async function getTags(): Promise<Tag[]> {
-  const res = await fetch("http://api:3000/tags", {
+  const res = await fetch(`${baseURL}/tags`, {
     cache: "no-store",
   });
 
