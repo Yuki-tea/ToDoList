@@ -11,6 +11,8 @@ services: # コンテナ（サービス）の定義エリア
       - "3000:3000" # ホストの3000番ポートを、コンテナの3000番に繋ぐ
     volumes:
       - ./api:/app # ホストのコードをコンテナ内の/appに同期させる（ホットリロード用）
+      - ./secrets/localhost.crt:/app/secrets/localhost.crt:ro
+      - ./secrets/localhost.key:/app/secrets/localhost.key:ro
       - /app/node_modules # ホスト側のnode_modulesでコンテナ内を上書きしないための「避難場所」（匿名ボリューム）
     environment: # コンテナ内で使える環境変数
       DB_HOST: db # 接続先はIPアドレスではなく、下のサービス名「db」を指定する
