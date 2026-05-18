@@ -3,10 +3,16 @@ FROM node:24-alpine
 
 WORKDIR /app
 
+# root権限で実行
+USER root
+RUN apk add --no-cache shadow ca-certificates
+
+# ルートCAをOSのストアに追加
+COPY rootCA.pem /usr/local/share/ca-certificates/rootCA.crt
+RUN update-ca-certificates
+
 ARG UID=1000
 ARG GID=1000
-
-RUN apk add --no-cache shadow
 
 RUN groupmod -g "${GID}" node && \
     usermod -u "${UID}" -g "${GID}" node

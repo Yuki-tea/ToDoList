@@ -39,10 +39,16 @@ services: # コンテナ（サービス）の定義エリア
       - "3001:3000" # ホストの3001番を、コンテナの3000番につなぐ
     volumes:
       - ./web:/app
+      - ./secrets/localhost.crt:/app/secrets/localhost.crt:ro
+      - ./secrets/localhost.key:/app/secrets/localhost.key:ro
+      - ./secrets/rootCA.pem:/app/secrets/rootCA.pem:ro
       - /app/node_modules
     environment:
       # ブラウザからAPIを呼ぶためのURL
-      - NEXT_PUBLIC_API_URL=http://localhost:3000
+      - NEXT_PUBLIC_API_URL=https://localhost:3000
+      - API_INTERNAL_URL=https://api:3000
+      - NODE_OPTIONS=--use-system-ca
+
     depends_on:
       - api # APIが立ち上がってからWebを立ち上げる
 
