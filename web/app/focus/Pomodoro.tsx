@@ -18,21 +18,29 @@ export default function Pomodoro({ mode, setMode }: Props) {
   const [timeCount, setTimeCount] = useState(FOCUS);
   const [roundCount, setRoundCount] = useState(0);
   const [isActive, setIsActive] = useState(false);
+  const [endTime, setEndTime] = useState<number | null>(null);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
-    if (isActive && timeCount > 0) {
+    if (isActive && endTime) {
       interval = setInterval(() => {
-        setTimeCount((prev) => prev - 1);
-      }, 1000);
-    } else if (isActive && timeCount === 0) {
-      setIsActive(false);
-      switchMode();
+        const now = Date.now();
+        const remaining = Math.max(0, Math.ceil((endTime - now) / 1000));
+
+        if (remaining === 0) {
+          setIsActive(false);
+          setEndTime(null);
+          setTimeCount(0);
+          switchMode();
+        } else {
+          setTimeCount(remaining);
+        }
+      }, 100); // チェック頻度を上げ、描画の遅延を防ぐ
     }
 
     return () => clearInterval(interval);
-  }, [isActive, timeCount]);
+  }, [isActive, endTime]);
 
   const switchMode = () => {
     if (mode === "Focus") {
@@ -51,8 +59,20 @@ export default function Pomodoro({ mode, setMode }: Props) {
     }
   };
 
+  const toggleActive = () => {
+    if (!isActive) {
+      // 開始・再開する時に、今の残り秒数から終了時刻を「固定」する
+      setEndTime(Date.now() + timeCount * 1000);
+    } else {
+      // 一時停止する時は終了時刻を破棄する
+      setEndTime(null);
+    }
+    setIsActive(!isActive);
+  };
+
   const reset = () => {
     setIsActive(false);
+    setEndTime(null);
     setTimeCount(FOCUS);
     setMode("Focus");
   };
@@ -92,7 +112,7 @@ export default function Pomodoro({ mode, setMode }: Props) {
                 ? "bg-gray-400 hover:bg-gray-500"
                 : "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-300"
             }`}
-            onClick={() => setIsActive(!isActive)}
+            onClick={toggleActive}
           >
             {isActive ? "PAUSE" : "START"}
           </button>
